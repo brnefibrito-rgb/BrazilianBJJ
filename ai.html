@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="Jiu-Jitsu tools" />
+        <meta name="author" content="" />
+        <title>AI - Hangman (Jiu-Jitsu)</title>
+        <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+        <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+        <link href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css" />
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css" />
+        <link href="css/styles.css" rel="stylesheet" />
+        <style>
+            .letter-btn { margin: 3px; }
+            #word { font-size: 1.8rem; letter-spacing: .2rem; font-family: monospace; }
+            #wrong { color: #b00; }
+            #hint { color: #666; font-style: italic; font-size: 0.95rem; margin-top: 0.5rem; }
+            #gallows svg { display: block; margin: 0 auto; }
+        </style>
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-light" id="mainNav">
+            <div class="container px-4 px-lg-5">
+                <a class="navbar-brand" href="index.html">Nefi Brito</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarResponsive">
+                    <ul class="navbar-nav ms-auto py-4 py-lg-0">
+                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="index.html">Home</a></li>
+                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="about.html">About</a></li>
+                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="post.html">Techniques</a></li>
+                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="contact.html">Contact</a></li>
+                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="ai.html">AI Game</a></li>
+                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="fromScratch.html">From Scratch</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <header class="masthead" style="background-image: url('assets/img/111022-HERO-dan-hooker-pre-fight.avif')">
+            <div class="container position-relative px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7">
+                        <div class="page-heading">
+                            <h1>Hangman — BJJ Edition</h1>
+                            <span class="subheading">Guess the Jiu-Jitsu word</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <main class="mb-4">
+            <div class="container px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7 text-center">
+                        <!-- Hangman gallows drawing -->
+                        <div id="gallows" class="mb-3">
+                            <svg width="160" height="180" viewBox="0 0 160 180" xmlns="http://www.w3.org/2000/svg">
+                                <!-- Base, pole, beam, rope — always visible -->
+                                <line x1="10" y1="170" x2="150" y2="170" stroke="#333" stroke-width="4"/>
+                                <line x1="40" y1="170" x2="40" y2="10" stroke="#333" stroke-width="4"/>
+                                <line x1="40" y1="10" x2="100" y2="10" stroke="#333" stroke-width="4"/>
+                                <line x1="100" y1="10" x2="100" y2="30" stroke="#333" stroke-width="3"/>
+                                <!-- Body parts — shown progressively by JS -->
+                                <circle id="h-head" cx="100" cy="45" r="15" stroke="#333" stroke-width="3" fill="none" style="display:none"/>
+                                <line id="h-body" x1="100" y1="60" x2="100" y2="110" stroke="#333" stroke-width="3" style="display:none"/>
+                                <line id="h-larm" x1="100" y1="75" x2="75" y2="95" stroke="#333" stroke-width="3" style="display:none"/>
+                                <line id="h-rarm" x1="100" y1="75" x2="125" y2="95" stroke="#333" stroke-width="3" style="display:none"/>
+                                <line id="h-lleg" x1="100" y1="110" x2="75" y2="140" stroke="#333" stroke-width="3" style="display:none"/>
+                                <line id="h-rleg" x1="100" y1="110" x2="125" y2="140" stroke="#333" stroke-width="3" style="display:none"/>
+                            </svg>
+                        </div>
+                        <p>Word length: <span id="length"></span></p>
+                        <div id="word" class="mb-2"></div>
+                        <div id="hint"></div>
+                        <p class="mt-2">Wrong guesses: <span id="wrong">0</span>/6</p>
+                        <div id="letters" class="my-3"></div>
+                        <div class="mt-3">
+                            <button id="restart" class="btn btn-secondary">New Word</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer class="border-top">
+            <div class="container px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7">
+                        <div class="small text-center text-muted fst-italic">Training tool for Jiu-Jitsu terms</div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        <script>
+            (function(){
+                const bjjWords = [
+                    { word: 'ARMBAR', hint: 'Joint lock targeting the elbow' },
+                    { word: 'TRIANGLE', hint: 'Choke using the legs around the neck and one arm' },
+                    { word: 'KIMURA', hint: 'Shoulder lock named after Masahiko Kimura' },
+                    { word: 'GUILLOTINE', hint: 'Choke applied from front headlock' },
+                    { word: 'OMOPLATA', hint: 'Shoulder lock using both legs' },
+                    { word: 'TORREANDO', hint: 'Guard pass also called the Bullfighter' },
+                    { word: 'SHRIMP', hint: 'Hip escape movement used to recover guard' },
+                    { word: 'SPRAWL', hint: 'Defensive move to stop a takedown' },
+                    { word: 'BERIMBOLO', hint: 'Inverted spinning technique to take the back' },
+                    { word: 'SEATBELT', hint: 'Back control grip with one arm over, one arm under' },
+                    { word: 'CLINCH', hint: 'Close-range grip fighting before a takedown' },
+                    { word: 'POSTURE', hint: 'Keeping your base upright inside the guard' },
+                    { word: 'BUTTERFLY', hint: 'Guard style using hooks under the thighs' },
+                    { word: 'LAPEL', hint: 'Part of the gi used for grips and chokes' },
+                    { word: 'SWEEP', hint: 'Reversing a bottom position to come on top' },
+                ];
+
+                const bodyParts = ['h-head','h-body','h-larm','h-rarm','h-lleg','h-rleg'];
+                const maxWrong = 6;
+                let word, hint, masked, wrong, usedLetters;
+
+                function pickWord() {
+                    const entry = bjjWords[Math.floor(Math.random() * bjjWords.length)];
+                    word = entry.word;
+                    hint = entry.hint;
+                }
+
+                function init() {
+                    pickWord();
+                    masked = Array.from(word).map(c => c === ' ' ? ' ' : '_');
+                    wrong = 0;
+                    usedLetters = new Set();
+                    bodyParts.forEach(id => document.getElementById(id).style.display = 'none');
+                    makeButtons();
+                    render();
+                }
+
+                function render() {
+                    document.getElementById('word').textContent = masked.join(' ');
+                    document.getElementById('wrong').textContent = wrong;
+                    document.getElementById('length').textContent = word.length;
+                    document.getElementById('hint').textContent = 'Hint: ' + hint;
+                    for (let i = 0; i < bodyParts.length; i++) {
+                        document.getElementById(bodyParts[i]).style.display = i < wrong ? '' : 'none';
+                    }
+                }
+
+                function makeButtons() {
+                    const lettersEl = document.getElementById('letters');
+                    lettersEl.innerHTML = '';
+                    for (let i = 65; i <= 90; i++) {
+                        const ch = String.fromCharCode(i);
+                        const btn = document.createElement('button');
+                        btn.className = 'btn btn-outline-primary letter-btn';
+                        btn.textContent = ch;
+                        btn.addEventListener('click', () => guess(ch, btn));
+                        lettersEl.appendChild(btn);
+                    }
+                }
+
+                function guess(ch, btn) {
+                    btn.disabled = true;
+                    btn.classList.remove('btn-outline-primary');
+                    if (word.includes(ch)) {
+                        btn.classList.add('btn-success');
+                        for (let i = 0; i < word.length; i++) if (word[i] === ch) masked[i] = ch;
+                    } else {
+                        btn.classList.add('btn-danger');
+                        wrong++;
+                    }
+                    render();
+                    checkEnd();
+                }
+
+                function checkEnd() {
+                    if (!masked.includes('_')) {
+                        setTimeout(() => alert('🥋 You win! The word was "' + word + '".'), 100);
+                    } else if (wrong >= maxWrong) {
+                        setTimeout(() => alert('Tapped out! The word was "' + word + '".'), 100);
+                    }
+                }
+
+                document.getElementById('restart').addEventListener('click', init);
+                init();
+            })();
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+</html>
